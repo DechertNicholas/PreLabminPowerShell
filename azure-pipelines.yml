@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  name: 'Requiem Labs'
+  name: 'Requiem Labs Build'
 
 # Test
 

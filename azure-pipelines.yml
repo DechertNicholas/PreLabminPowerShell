@@ -59,6 +59,7 @@ jobs:
 # Build
 
   - job: Build
+    dependsOn: GitVersioning
     steps:
     - task: PowerShell@2
       inputs:

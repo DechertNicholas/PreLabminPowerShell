@@ -6,7 +6,7 @@ function PrepNonPipelineEnv {
     Write-Output "buildDir = $buildDir"
     $env:SYSTEM_DEFAULTWORKINGDIRECTORY = Resolve-Path $buildDir\..\
     Write-Output $env:SYSTEM_DEFAULTWORKINGDIRECTORY
-    $env:manifestPath = Join-Path -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY -ChildPath "src\$moduleName.psd1"
+    SetManifestPath
     Write-Output "Manifest path = $env:manifestPath"
     $stagingDirName = "drop"
     $env:BUILD_ARTIFACTSTAGINGDIRECTORY = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName"
@@ -19,11 +19,17 @@ function PrepNonPipelineEnv {
     Write-Output "File copied"
 }
 
+function SetManifestPath {
+    $env:manifestPath = Join-Path -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY -ChildPath "src\$moduleName.psd1"
+}
+
 $moduleName = 'PreLabminPowerShell'
 
 ## Set local vars if running on non-pipeline agent
 if ($null -eq $env:AGENT_ID) {
     PrepNonPipelineEnv
+} else {
+    SetManifestPath
 }
 
 $buildVersion = $env:BUILDVER

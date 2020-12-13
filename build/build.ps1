@@ -49,9 +49,14 @@ $manifestContent | Set-Content -Path $env:manifestPath
 
 ## Create the actual module file
 Write-Output "Creating $moduleName.psm1"
-New-Item -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -Name "$moduleName.psm1" -ItemType File -Force
+New-Item -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -Name "$moduleName.psm1" -ItemType File -Force | Out-Null
+Write-Output "File created"
 ## Add function content to the module
+Write-Output "Adding function content to the module"
 foreach ($function in (Get-ChildItem $functionsFolderPath | Select-Object -ExpandProperty FullName)) {
     $content = Get-Content $function
-    $content | Set-Content -Path (Join-Path -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -ChildPath "$moduleName.psm1")
+    $content | Add-Content -Path (Join-Path -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY `
+        -ChildPath "$moduleName.psm1")
+    Write-Output "Function $function added"
 }
+Write-Output "Build finished successfully!"

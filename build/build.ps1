@@ -38,7 +38,7 @@ if ($null -eq $env:AGENT_ID) {
     SetManifestPath
     CopyManifestToArtifactDir
     # FOR TESTING! Remove once GitVer is installed and configured
-    $env:BUILDVER = "0.0.1"
+    #$env:BUILDVER = "0.0.1"
     # Finish testing area
 }
 

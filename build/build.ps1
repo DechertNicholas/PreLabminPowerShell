@@ -10,17 +10,22 @@ function PrepNonPipelineEnv {
     Write-Output "Manifest path = $env:manifestPath"
     $stagingDirName = "drop"
     $env:BUILD_ARTIFACTSTAGINGDIRECTORY = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName"
-    Write-Output "Copying manifest to output dir"
+    Write-Output "Creating artifact directory"
     if ((Test-Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY) -eq $false) {
         New-Item -ItemType Directory -Name $stagingDirName -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY | Out-Null
     }
-    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1" -Force
-    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1"
-    Write-Output "File copied"
+    CopyManifestToArtifactDir
 }
 
 function SetManifestPath {
     $env:manifestPath = Join-Path -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY -ChildPath "src\$moduleName.psd1"
+}
+
+function CopyManifestToArtifactDir {
+    Write-Output "Copying manifest to output dir"
+    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1" -Force
+    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1"
+    Write-Output "File copied"
 }
 
 $moduleName = 'PreLabminPowerShell'
@@ -30,10 +35,11 @@ if ($null -eq $env:AGENT_ID) {
     PrepNonPipelineEnv
 } else {
     SetManifestPath
+    CopyManifestToArtifactDir
+    # FOR TESTING! Remove once GitVer is installed and configured
+    $env:BUILDVER = "0.0.1"
+    # Finish testing area
 }
-# FOR TESTING! Remove once GitVer is installed and configured
-$env:BUILDVER = "0.0.1"
-# Finish testing area
 
 $buildVersion = $env:BUILDVER
 

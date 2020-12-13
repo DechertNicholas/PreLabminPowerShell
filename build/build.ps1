@@ -44,7 +44,7 @@ if ($null -eq $env:AGENT_ID) {
 
 ## Update build version in manifest
 Write-Output "Updating module version"
-Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $env:GITVERSION_SEMVER
+Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $(GitVersion.SemVer)
 
 ## Find all of the public functions
 Write-Output "Gathering function names for manifest"

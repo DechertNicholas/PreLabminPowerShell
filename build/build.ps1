@@ -31,6 +31,9 @@ if ($null -eq $env:AGENT_ID) {
 } else {
     SetManifestPath
 }
+# FOR TESTING! Remove once GitVer is installed and configured
+$env:BUILDVER = "0.0.1"
+# Finish testing area
 
 $buildVersion = $env:BUILDVER
 

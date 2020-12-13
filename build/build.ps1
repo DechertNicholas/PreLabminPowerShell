@@ -42,11 +42,9 @@ if ($null -eq $env:AGENT_ID) {
     # Finish testing area
 }
 
-$buildVersion = $env:BUILDVER
-
 ## Update build version in manifest
 Write-Output "Updating module version"
-Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $buildVersion
+Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $env:GITVERSION_SEMVER
 
 ## Find all of the public functions
 Write-Output "Gathering function names for manifest"

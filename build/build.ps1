@@ -1,6 +1,7 @@
 function PrepNonPipelineEnv {
     Write-Output "Setting env vars"
-    $env:BUILDVER = "0.0.1" # For local build only
+    $env:GITVERSION_SEMVER = "0.0.1" # For local build only
+    $env:GITVERSION_BUILDMETADATAPADDED = "0011"
     Write-Output "BUILDVER = $env:BUILDVER"
     $buildDir = Split-Path -Parent $MyInvocation.ScriptName
     Write-Output "buildDir = $buildDir"
@@ -60,6 +61,7 @@ if ((Test-Path -Path $functionsFolderPath) -and ($publicFunctionNames = Get-Chil
 Write-Output "Applying function export names"
 $manifestContent = Get-Content -Path $env:manifestPath
 $manifestContent = $manifestContent -replace "'<FunctionsToExport>'", "@(`n`t$funcStrings`n`t)"
+$manifestContent = $manifestContent -replace "'<Prerelease>'", "`'+$env:GITVERSION_BUILDMETADATAPADDED`'"
 $manifestContent | Set-Content -Path $env:manifestPath
 
 ## Create the actual module file

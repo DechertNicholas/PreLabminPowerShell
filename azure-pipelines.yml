@@ -1,0 +1,21 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  name: 'Requiem Labs Build'
+
+# Test
+
+
+# Build
+jobs:
+  - job: Build
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: '$(Build.SourcesDirectory)/build/build.ps1'

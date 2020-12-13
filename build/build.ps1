@@ -1,6 +1,6 @@
 function PrepNonPipelineEnv {
     Write-Output "Setting env vars"
-    $env:BUILDVER = "0.0.1"
+    $env:BUILDVER = "0.0.1" # For local build only
     Write-Output "BUILDVER = $env:BUILDVER"
     $buildDir = Split-Path -Parent $MyInvocation.ScriptName
     Write-Output "buildDir = $buildDir"

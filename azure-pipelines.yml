@@ -22,7 +22,15 @@ jobs:
         displayName: Determine Version
 # Test
 # Temporary
-      - script: |
+      
+            
+
+# Build
+
+  - job: Build
+    dependsOn: GitVersioning
+    steps:
+    - script: |
             echo Major: $(GitVersion.Major)
             echo Minor: $(GitVersion.Minor)
             echo Patch: $(GitVersion.Patch)
@@ -55,12 +63,10 @@ jobs:
             echo CommitsSinceVersionSourcePadded: $(GitVersion.CommitsSinceVersionSourcePadded)
             echo UncommittedChanges: $(GitVersion.UncommittedChanges)
             echo CommitDate: $(GitVersion.CommitDate)
-
-# Build
-
-  - job: Build
-    dependsOn: GitVersioning
-    steps:
     - task: PowerShell@2
       inputs:
-        filePath: '$(Build.SourcesDirectory)/build/build.ps1'
+        targetType: 'inline'
+        script: 'dir env:'
+    # - task: PowerShell@2
+    #   inputs:
+    #     filePath: '$(Build.SourcesDirectory)/build/build.ps1'

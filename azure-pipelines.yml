@@ -28,14 +28,13 @@ jobs:
         displayName: Build Module
         inputs:
           filePath: '$(Build.SourcesDirectory)/build/build.ps1'
+
 # Test
 
 # Publish Artifacts
-  - job: Publish
-    dependsOn: VersionBuild
-    steps:
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
+

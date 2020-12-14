@@ -22,6 +22,10 @@ jobs:
         displayName: Determine Version
 # Build
       - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: 'dir env:'
+      - task: PowerShell@2
         displayName: Build Module
         inputs:
           filePath: '$(Build.SourcesDirectory)/build/build.ps1'

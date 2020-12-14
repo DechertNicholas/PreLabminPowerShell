@@ -3,8 +3,7 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+# Trigger is all branches
 
 pool:
   name: 'Requiem Labs Build'
@@ -29,4 +28,13 @@ jobs:
         displayName: Build Module
         inputs:
           filePath: '$(Build.SourcesDirectory)/build/build.ps1'
+
 # Test
+
+# Publish Artifacts
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+

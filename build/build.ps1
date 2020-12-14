@@ -1,6 +1,6 @@
 function PrepNonPipelineEnv {
     Write-Output "Setting env vars"
-    $env:GITVERSION_SEMVER = "0.0.1" # For local build only
+    $env:GITVERSION_MAJORMINORPATCH = "0.0.1" # For local build only
     $env:GITVERSION_BUILDMETADATAPADDED = "0011"
     Write-Output "BUILDVER = $env:BUILDVER"
     $buildDir = Split-Path -Parent $MyInvocation.ScriptName
@@ -44,7 +44,7 @@ if ($null -eq $env:AGENT_ID) {
 
 ## Update build version in manifest
 Write-Output "Updating module version"
-Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $env:GITVERSION_SEMVER
+Update-ModuleManifest -Path $env:manifestPath -ModuleVersion $env:GITVERSION_MAJORMINORPATCH
 
 ## Find all of the public functions
 Write-Output "Gathering function names for manifest"

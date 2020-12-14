@@ -32,6 +32,7 @@ jobs:
 
 # Publish Artifacts
   - job: Publish
+    dependsOn: VersionBuild
     steps:
       - task: PublishBuildArtifacts@1
         inputs:

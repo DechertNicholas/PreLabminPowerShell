@@ -52,13 +52,22 @@ function Update-LabMachines {
         log to some place
     #>
 
-    $poolMachines = Get-LabMachine -PoolName $PoolName
-    if ($null -eq $poolMachines) {
-        #LogLabminOperation -Message "No machines found in this pool: $PoolName" -LogType Error
-        throw "No machines found in this pool: $PoolName"
-    }
-    if ($null -ne $Machines) {
+    $poolMachines = Get-LabMachine -PoolName $PoolName | Select-Object -ExpandProperty Name
+    [string[]] $machinesToUpdate = $null # Prep for below
 
+    if ($null -ne $Machines) {
+        foreach ($machine in $Machines) {
+            if ($machine -in $poolMachines) {
+                $machinesToUpdate += $machine
+            } else {
+                throw "Unable to verify machine $machine exists in $PoolName."
+            }
+        }
+    } else {
+        $machinesToUpdate = $poolMachines # Use a common variable name
+    }
+    if ($UpdateOfflineMachines) {
+        
     }
 }
 

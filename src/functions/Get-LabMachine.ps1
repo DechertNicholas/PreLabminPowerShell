@@ -49,11 +49,21 @@ function Get-LabMachine {
     
     switch ($PSCmdlet.ParameterSetName) {
         'Machine' {
-            return $csv | Where-Object -FilterScript {$_.Name -like $MachineName}
+            $result = $csv | Where-Object -FilterScript {$_.Name -like $MachineName}
+            if ($null -eq $result) {
+                throw "Unable to find machine `'$MachineName`' in inventory."
+            } else {
+                return $result
+            }
         }
 
         'Pool' {
-            return $csv | Where-Object -FilterScript {$_.Pool -like $PoolName}
+            $result = $csv | Where-Object -FilterScript {$_.Pool -like $PoolName}
+            if ($null -eq $result) {
+                throw "Unable to find pool `'$PoolName`' in inventory."
+            } else {
+                return $result
+            }
         }
     }
 }

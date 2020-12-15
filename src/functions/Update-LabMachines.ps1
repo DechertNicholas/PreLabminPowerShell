@@ -51,6 +51,15 @@ function Update-LabMachines {
         begin next machine
         log to some place
     #>
+
+    $poolMachines = Get-LabMachine -PoolName $PoolName
+    if ($null -eq $poolMachines) {
+        #LogLabminOperation -Message "No machines found in this pool: $PoolName" -LogType Error
+        throw "No machines found in this pool: $PoolName"
+    }
+    if ($null -ne $Machines) {
+
+    }
 }
 
 

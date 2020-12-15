@@ -40,10 +40,10 @@ function Get-LabMachine {
     if ($null -eq $csvLocation) {
         $message = "Unable to determine CSV location. Check reg key HKLM:\SOFTWARE\Requiem Labs\Labmin\"`
         + "Environment Config\, Datasource property"
-        LogLabminOperation -Message $message -LogType "Error"
+        #LogLabminOperation -Message $message -LogType "Error"
         throw $message
     }
-    LogLabminOperation -Message "Found Datasource at $csvLocation" -LogType "Success"
+    #LogLabminOperation -Message "Found Datasource at $csvLocation" -LogType "Success"
     
     $csv = Import-Csv $csvLocation
     

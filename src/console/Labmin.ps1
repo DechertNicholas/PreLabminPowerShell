@@ -39,11 +39,23 @@ if ($null -eq $shouldCreateShortcut -or $GenerateShortcut -eq $true) {
     $Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
     $Shortcut.TargetPath = $SourceFileLocation
     $Shortcut.Arguments = "-NoExit -Command `"&`'$LabminLocation`'`"" # powershell.exe -NoExit -Command "&'\path\to\Labmin.ps1'"
+    $Shortcut.WorkingDirectory = "$(Get-Location)"
     # Set the icon location $Shortcut.IconLocation = 
     $Shortcut.Save()
+
+    # Set the "Run as admin" flag (this is needed for Updates and other things)
+    $bytes = [System.IO.File]::ReadAllBytes("$(Get-Location)\Labmin Console.lnk")
+    $bytes[0x15] = $bytes[0x15] -bor 0x20 #set byte 21 (0x15) bit 6 (0x20) ON
+    [System.IO.File]::WriteAllBytes("$(Get-Location)\Labmin Console.lnk", $bytes)
     Write-Output "Shortcut created. Please launch Labmin with the shortcut!"
     return
 }
+
+# Running as admin sets location to system32, need to be in labmin dir to load modules
+$absoluteScriptPath = ($MyInvocation.Line -split "&")[1]
+$absoluteScriptPath = $absoluteScriptPath -replace "`'", ""
+$absoluteScriptPath = $absoluteScriptPath -replace "Labmin.ps1", ""
+Set-Location $absoluteScriptPath
 
 # Some modules needed for operation exist in PowerShell Gallery
 $neededModules = @(

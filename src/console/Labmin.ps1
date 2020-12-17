@@ -61,7 +61,13 @@ foreach ($moduleName in $neededModules) {
     Write-Output "[$moduleName] Searching for installed versions..."
     $foundModules = Get-Module -Name $moduleName -ListAvailable
     if ($null -eq $foundModules) {
-        #Write-Output
+        Write-Output "[$moduleName] Unable to find any local versions of $moduleName. Prompting for install"
+        Install-Module -Name $moduleName
+        Import-Module -Name $moduleName -RequiredVersion $latestVersion
+    } else {
+        $latestVersion = $foundModules[$foundModules.Count - 1].Version
+        Write-Output "[$moduleName] Found version $latestVersion. Loading module..."
+        Import-Module -Name $moduleName -RequiredVersion $latestVersion
     }
 }
 

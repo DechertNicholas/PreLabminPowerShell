@@ -15,6 +15,10 @@ function PrepNonPipelineEnv {
     if ((Test-Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY) -eq $false) {
         New-Item -ItemType Directory -Name $stagingDirName -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY | Out-Null
     }
+    if ((Test-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules") -eq $false) {
+        New-Item -ItemType Directory -Name "modules" -Path "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName" `
+            | Out-Null
+    }
     CopyManifestToArtifactDir
 }
 
@@ -24,8 +28,8 @@ function SetManifestPath {
 
 function CopyManifestToArtifactDir {
     Write-Output "Copying manifest to output dir"
-    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1" -Force
-    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1"
+    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1" -Force
+    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1"
     Write-Output "File copied"
 }
 
@@ -64,14 +68,17 @@ $manifestContent | Set-Content -Path $env:manifestPath
 
 ## Create the actual module file
 Write-Output "Creating $moduleName.psm1"
-New-Item -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -Name "$moduleName.psm1" -ItemType File -Force | Out-Null
+New-Item -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules" -Name "$moduleName.psm1" -ItemType File -Force `
+    | Out-Null
 Write-Output "File created"
 ## Add function content to the module
 Write-Output "Adding function content to the module"
 foreach ($function in (Get-ChildItem $functionsFolderPath | Select-Object -ExpandProperty FullName)) {
     $content = Get-Content $function
-    $content | Add-Content -Path (Join-Path -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY `
+    $content | Add-Content -Path (Join-Path -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules" `
         -ChildPath "$moduleName.psm1")
     Write-Output "Function $function added"
 }
+Write-Output "Copying Console to staging dir"
+Copy-Item (Resolve-Path ".\..\src\console\Labmin.ps1") "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" -Force
 Write-Output "Build finished successfully!"

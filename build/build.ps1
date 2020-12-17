@@ -15,10 +15,6 @@ function PrepNonPipelineEnv {
     if ((Test-Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY) -eq $false) {
         New-Item -ItemType Directory -Name $stagingDirName -Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY | Out-Null
     }
-    if ((Test-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules") -eq $false) {
-        New-Item -ItemType Directory -Name "modules" -Path "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName" `
-            | Out-Null
-    }
     CopyManifestToArtifactDir
 }
 
@@ -28,6 +24,10 @@ function SetManifestPath {
 
 function CopyManifestToArtifactDir {
     Write-Output "Copying manifest to output dir"
+    if ((Test-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules") -eq $false) {
+        New-Item -ItemType Directory -Name "modules" -Path "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName" `
+            | Out-Null
+    }
     Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1" -Force
     $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1"
     Write-Output "File copied"

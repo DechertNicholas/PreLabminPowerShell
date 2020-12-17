@@ -3,9 +3,16 @@
 # Load labmin module
 # Set prompt
 
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [Switch]
+    $GenerateShortcut
+)
+
 $shouldCreateShortcut = Get-ItemProperty -Path 'HKCU:\SOFTWARE\Requiem Labs\Labmin\FirstRun\' `
     -ErrorAction SilentlyContinue | Select-Object -ExpandProperty ShouldCreateShortcut
-if ($null -eq $shouldCreateShortcut) {
+if ($null -eq $shouldCreateShortcut -or $GenerateShortcut -eq $true) {
     # Reg value doesn't exist; create, create shortcut, then exit
     Write-Output "Unable to get reg key value, creating the reg key"
     if ((Test-Path "HKCU:\SOFTWARE\Requiem Labs") -eq $false) {
@@ -18,7 +25,8 @@ if ($null -eq $shouldCreateShortcut) {
         New-Item -Path "HKCU:\SOFTWARE\Requiem Labs\Labmin" -Name "FirstRun" | Out-Null
     }
     Write-Output "Setting reg key value"
-    New-ItemProperty -Path "HKCU:\SOFTWARE\Requiem Labs\Labmin\FirstRun" -Name ShouldCreateShortcut -Value 0 | Out-Null
+    New-ItemProperty -Path "HKCU:\SOFTWARE\Requiem Labs\Labmin\FirstRun" -Name ShouldCreateShortcut -Value 0 `
+        -ErrorAction SilentlyContinue | Out-Null
     Write-Output "Creating Labmin Shortcut"
     $ShortcutLocation = "$(Get-Location)\Labmin Console.lnk"
     if (Test-Path $ShortcutLocation -PathType Leaf) {

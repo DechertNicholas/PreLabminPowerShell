@@ -24,8 +24,12 @@ function SetManifestPath {
 
 function CopyManifestToArtifactDir {
     Write-Output "Copying manifest to output dir"
-    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1" -Force
-    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\$moduleName.psd1"
+    if ((Test-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules") -eq $false) {
+        New-Item -ItemType Directory -Name "modules" -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" `
+            | Out-Null
+    }
+    Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1" -Force
+    $env:manifestPath = Resolve-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1"
     Write-Output "File copied"
 }
 
@@ -58,20 +62,38 @@ if ((Test-Path -Path $functionsFolderPath) -and ($publicFunctionNames = Get-Chil
 ## Add all public functions to FunctionsToExport attribute
 Write-Output "Applying function export names"
 $manifestContent = Get-Content -Path $env:manifestPath
-$manifestContent = $manifestContent -replace "'<FunctionsToExport>'", "@(`n`t$funcStrings`n`t)"
+$manifestContent = $manifestContent -replace "'<FunctionsToExport>'", "@(`n`t$funcStrings`n)"
 $manifestContent = $manifestContent -replace "'<Prerelease>'", "`'+$env:GITVERSION_BUILDMETADATAPADDED`'"
 $manifestContent | Set-Content -Path $env:manifestPath
 
 ## Create the actual module file
 Write-Output "Creating $moduleName.psm1"
-New-Item -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -Name "$moduleName.psm1" -ItemType File -Force | Out-Null
+New-Item -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules" -Name "$moduleName.psm1" -ItemType File -Force `
+    | Out-Null
 Write-Output "File created"
 ## Add function content to the module
 Write-Output "Adding function content to the module"
+$aliasStrings = @()
 foreach ($function in (Get-ChildItem $functionsFolderPath | Select-Object -ExpandProperty FullName)) {
     $content = Get-Content $function
-    $content | Add-Content -Path (Join-Path -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY `
+    $content | Add-Content -Path (Join-Path -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules" `
         -ChildPath "$moduleName.psm1")
     Write-Output "Function $function added"
+    # Add alias' to the file while we already have the content
+    $alias = $content | Select-String -Pattern '\[Alias\(' -ErrorAction SilentlyContinue
+    if ($null -ne $alias) {
+        $aliasStrings += ($alias -split '"')[1]
+    }
 }
+# Add alias to the manifest
+if ($null -ne $aliasStrings) {
+    $aliasStrings = "'$($aliasStrings -join "',`n`t'")'"
+    Write-Output "Applying manifest alias names"
+    $manifestContent = Get-Content -Path $env:manifestPath
+    $manifestContent = $manifestContent -replace "'<AliasToExport>'", "@(`n`t$aliasStrings`n)"
+    $manifestContent | Set-Content -Path $env:manifestPath
+}
+Write-Output "Copying Console to staging dir"
+Copy-Item "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\src\console\Labmin.ps1" `
+    "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" -Force
 Write-Output "Build finished successfully!"

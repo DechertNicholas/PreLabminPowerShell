@@ -71,6 +71,16 @@ foreach ($moduleName in $neededModules) {
     }
 }
 
+Write-Output "Loading Labmin modules..."
+$modules = Get-ChildItem ".\modules\*.psd1"
+foreach ($module in $modules) {
+    $info = Get-Module $module -ListAvailable
+    Write-Output "[$($info.Name)] Loading version $($info.Version)..."
+    Import-Module $module
+}
+
+Write-Output "Ready!"
+
 function global:prompt
 {
     "(Labmin [$(hostname)])> "

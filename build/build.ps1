@@ -94,5 +94,6 @@ if ($null -ne $aliasStrings) {
     $manifestContent | Set-Content -Path $env:manifestPath
 }
 Write-Output "Copying Console to staging dir"
-Copy-Item (Resolve-Path ".\..\src\console\Labmin.ps1") "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" -Force
+Copy-Item "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\src\console\Labmin.ps1" `
+    "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" -Force
 Write-Output "Build finished successfully!"

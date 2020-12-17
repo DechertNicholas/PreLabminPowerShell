@@ -25,7 +25,7 @@ function SetManifestPath {
 function CopyManifestToArtifactDir {
     Write-Output "Copying manifest to output dir"
     if ((Test-Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules") -eq $false) {
-        New-Item -ItemType Directory -Name "modules" -Path "$env:SYSTEM_DEFAULTWORKINGDIRECTORY\$stagingDirName" `
+        New-Item -ItemType Directory -Name "modules" -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY" `
             | Out-Null
     }
     Copy-Item $env:manifestPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\modules\$moduleName.psd1" -Force

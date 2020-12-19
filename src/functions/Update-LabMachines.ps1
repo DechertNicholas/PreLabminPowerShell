@@ -69,6 +69,15 @@ function Update-LabMachines {
     if ($UpdateOfflineMachines) {
         
     }
+
+    foreach ($machine in $machinesToUpdate) {
+        try {
+            Invoke-WUJob -ComputerName $machine -Script {Import-Module PSWindowsUpdate; Install-WindowsUpdate `
+                -MicrosoftUpdate -AcceptAll -AutoReboot} -RunNow -Confirm:$false
+        } catch {
+            Write-Error $_
+        }
+    }
 }
 
 
